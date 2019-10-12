@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>多连击</title>
+    <style>
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        body:active #nub{
+            font-size: 10px;
+        }
+        #nub{
+            user-select: none;
+            transition-duration: 0.2s;
+        }
+    </style>
+</head>
+<!--将连击事件绑定给body-->
+<body onclick="mk.activate()">
+    <div id="nub" style="position: absolute;top: 50%;left: 50%;transform: translateX(-50%) translateY(-50%)">点击屏幕！</div>
+
+<script src="../JS/mick.js"></script>
+<script>
+    let div = document.getElementById("nub");
+    let mk = new Mick(999);//实列化Mick，定义最高连击次数（必须）
+    mk.changePreFunc("[0,999]changeNub");//设置预处理事件（1到999次点击时，每次点击都会执行，1000次点击后不执行任何事件）
+    mk.changeIntervalTime("[0,5]300 [5,999]auto [0]auto");//设置点击间隔，单位：毫秒，auto为系统自动调整
+    mk.changeEndFunc("showMsg");//设置连击结束事件
+
+    function changeNub() {
+        let nub = mk.getTimes();//获取当前连击次数
+        div.style.fontSize=(16+nub)+"px";
+        div.innerHTML = "连击"+nub+"次！";
+    }
+
+    function showMsg() {
+        let nub = mk.getActiveTimes();//获取上一次连击次数
+        alert("你连续点击了"+nub+"次！");
+        div.innerHTML = "点击屏幕！";
+    }
+</script>
+</body>
+</html>

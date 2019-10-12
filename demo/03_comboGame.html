@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>连击游戏</title>
+    <style>
+        html,body{
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            background-color: #181a1b;
+            color: aliceblue;
+        }
+        .nom{
+            font-size: 50px;
+            transition-duration: 100ms;
+        }
+    </style>
+</head>
+<body>
+<div style="position: absolute;left: 50%;top: 50%;transform: translateY(-100%) translateX(-50%)">
+    <h1 id="title" style="text-align: center">第1关</h1><h2 id="lnrMod" style="display: none; color: #ec971f;text-align: center">(老年人模式)</h2>
+    <div id="game-pane"></div>
+</div>
+<script src="../JS/mick.js"></script>
+<script>
+    let level=6;//按键数量
+    let intime=300;//连击间隔时间
+    document.onkeydown=function(ev){
+        //绑定连续触发事件
+        mike.activate();
+    };
+    window.onload = function(){
+        startNewGame();
+    };
+    let mike = new Mick(36); //你也可以这样使用new Mick(36,"","[0,"+level+"]clc","[0,"+level+"]"+intime","clr("+level+")")
+    mike.changePreFunc("[0,"+level+"]clc");//每次按下执行clc判断键值
+    mike.changeEndFunc("clr("+level+")");//连击结束执行clr清屏
+    mike.changeIntervalTime("[0,"+level+"]"+intime);//连击间隔时间
+
+    let list = ["↑","↓","←","→"];
+    let gameList = new Array(level);
+    function clc() {
+        let a = getKey();//获取按键值
+        let nub = mike.getTimes()-1;//获取当前连击等级（次数）
+        if (gameList[nub]===a) {
+            document.getElementById("div"+nub).style.color="red";
+            if (nub+1===level){
+                if (level===35){
+                    alert("你已经玩翻版了，不可思议！");
+                    return;
+                }
+                setTimeout(function () {
+                    mike.endImmediately();//立即结束连击并且执行结束事件
+                    level++;
+                    intime-=4;
+                    mike.changePreFunc("["+(level-1)+"]clc");
+                    mike.changeEndFunc("clr("+level+")");
+                    startNewGame();
+                    document.getElementById("title").innerHTML="第"+(level-5)+"关";
+                },200);
+            }
+        }
+        else {
+            mike.endImmediately();
+            clr(nub);
+        }
+    }
+    function getKey() {
+        if (event.key==="ArrowUp") return "↑";
+        if (event.key==="ArrowDown") return "↓";
+        if (event.key==="ArrowLeft") return "←";
+        if (event.key==="ArrowRight") return "→";
+        return event.key;
+    }
+    function clr(nub) {
+        for (let i=0;i<nub;i++) document.getElementById("div"+i).style.color="aliceblue";
+    }
+    function startNewGame() {
+        document.getElementById("game-pane").innerHTML="";
+        for (let i=0;i<level;i++){
+            let v = Math.floor(Math.random()*4);
+            gameList[i]=list[v];
+            let tmp = document.createElement("label");
+            tmp.id="div"+i;
+            tmp.className = "nom";
+            tmp.innerHTML=gameList[i];
+            document.getElementById("game-pane").appendChild(tmp);
+        }
+    }
+</script>
+</body>
+</html>

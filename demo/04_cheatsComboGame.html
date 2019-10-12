@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>作弊模式</title>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            background-color: #181a1b;
+            color: aliceblue;
+        }
+
+        .nom {
+            font-size: 50px;
+            transition-duration: 100ms;
+        }
+    </style>
+</head>
+<body>
+<div style="position: absolute;left: 50%;top: 50%;transform: translateY(-100%) translateX(-50%)">
+    <h1 id="title" style="text-align: center">第1关</h1>
+    <h2 id="lnrMod" style="display: none; color: #ec971f;text-align: center">(老年人模式)</h2>
+    <div id="game-pane"></div>
+</div>
+<script src="../JS/mick.js"></script>
+<script>
+    //作弊模式
+    let cheatMike = new Mick(12, "", "[0,12]cheatMod", "[0,12]1000");
+    let cheats = ["↑", "↑", "↓", "↓", "←", "→", "←", "→", "b", "a", "b", "a"];
+    let swc = 0;
+
+    function cheatMod() {
+        if (swc === 1) return;
+        let a = getKey();//获取按键值
+        let nub = cheatMike.getTimes() - 1;//获取连击等级
+        if (cheats[nub] === a) {//对照表cheats
+            if (nub === 11) {//按下最后一个键时激活作弊模式
+                swc = 1;
+                mike.changeIntervalTime("[0,36]1000");
+                document.getElementById("lnrMod").style.display = "block";
+            }
+        } else cheatMike.endImmediately();//与表不符合，立即结束连击
+    }
+
+    //游戏源码
+    let level = 6;
+    let intime = 300;
+    document.onkeydown = function (ev) {
+        mike.activate();
+        cheatMike.activate();
+    };
+    window.onload = function () {
+        alert("游戏玩不过？试试魂斗罗秘籍");
+        startNewGame();
+    };
+    let mike = new Mick(36);
+
+    mike.changePreFunc("[0," + level + "]clc");
+    mike.changeEndFunc("clr(" + level + ")");
+    mike.changeIntervalTime("[0," + level + "]" + intime);
+
+    let list = ["↑", "↓", "←", "→"];
+    let gameList = new Array(level);
+
+    function clc() {
+        let a = getKey();
+        let nub = mike.getTimes() - 1;
+        if (gameList[nub] === a) {
+            document.getElementById("div" + nub).style.color = "red";
+            if (nub + 1 === level) {
+                if (level === 35) {
+                    if (swc === 1) alert("你已经玩老年人模式翻版了!");
+                    if (swc === 0) alert("你已经玩翻版了!收下我的膝盖");
+                    return;
+                }
+                setTimeout(function () {
+                    mike.endImmediately();
+                    level++;
+                    intime -= 4;
+                    if (swc !== 1) mike.changeIntervalTime("[0," + level + "]" + intime);
+                    mike.changePreFunc("[" + (level - 1) + "]clc");
+                    mike.changeEndFunc("clr(" + level + ")");
+                    startNewGame();
+                    document.getElementById("title").innerHTML = "第" + (level - 5) + "关";
+
+                }, 100);
+            }
+        } else {
+            mike.endImmediately();
+            clr(nub);
+        }
+    }
+
+    function getKey() {
+        if (event.key === "ArrowUp") return "↑";
+        if (event.key === "ArrowDown") return "↓";
+        if (event.key === "ArrowLeft") return "←";
+        if (event.key === "ArrowRight") return "→";
+        return event.key;
+    }
+
+    function clr(nub) {
+        for (let i = 0; i < nub; i++) document.getElementById("div" + i).style.color = "aliceblue";
+    }
+
+    function startNewGame() {
+        document.getElementById("game-pane").innerHTML = "";
+        for (let i = 0; i < level; i++) {
+            let v = Math.floor(Math.random() * 4);
+            gameList[i] = list[v];
+            let tmp = document.createElement("label");
+            tmp.id = "div" + i;
+            tmp.className = "nom";
+            tmp.innerHTML = gameList[i];
+            document.getElementById("game-pane").appendChild(tmp);
+        }
+    }
+</script>
+</body>
+</html>
